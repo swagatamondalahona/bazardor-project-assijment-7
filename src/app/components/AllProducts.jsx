@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 
 const API_URL =
-    "https://api.api-store.workers.dev/api/bazardor/products";
-
+    "https://api.abcz.workers.dev/api/bazardor/products";
 const AllProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
