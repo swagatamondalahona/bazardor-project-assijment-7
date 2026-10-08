@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import PriceTicker from "./PriceTicker";
 
 const categories = [
     {
@@ -51,18 +50,14 @@ const categories = [
 export default function Navbar() {
     const pathname = usePathname();
 
-    // পরে Better Auth-এর session এখানে বসাতে পারবে
     const isLoggedIn = false;
 
     return (
         <header className="w-full bg-white">
 
-            {/* =========================================
-                TOP BAR
-            ========================================= */}
+            {/* TOP BAR */}
             <div className="bg-[#1f1f1f]">
                 <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-
                     <Link
                         href="/"
                         className="text-sm font-medium text-[#8ed8ff] transition hover:text-white"
@@ -73,20 +68,15 @@ export default function Navbar() {
                     <div className="text-lg font-bold text-[#8ed8ff]">
                         &lt;/&gt;
                     </div>
-
                 </div>
             </div>
 
-
-            {/* =========================================
-                LOGO + AUTH
-            ========================================= */}
-            <div className="border-b border-gray-200">
+            {/* LOGO + AUTH */}
+            <div className="border-b border-gray-200 bg-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
                     <div className="flex min-h-[82px] items-center justify-between">
 
-                        {/* Logo */}
+                        {/* LOGO */}
                         <Link
                             href="/"
                             className="flex items-center gap-3"
@@ -108,16 +98,14 @@ export default function Navbar() {
                                 </h1>
 
                                 <p className="text-[10px] text-gray-500 sm:text-xs">
-                                    মঙ্গলবার, ৭ অক্টোবর, ২০২৬
+                                    শুক্রবার, ৯ অক্টোবর, ২০২৬
                                 </p>
                             </div>
                         </Link>
 
-
-                        {/* Authentication */}
+                        {/* AUTH */}
                         {!isLoggedIn ? (
                             <div className="flex items-center gap-1 sm:gap-3">
-
                                 <Link
                                     href="/signin"
                                     className="px-2 py-2 text-xs font-medium text-gray-700 transition hover:text-green-600 sm:px-3 sm:text-sm"
@@ -131,65 +119,52 @@ export default function Navbar() {
                                 >
                                     সাইন আপ
                                 </Link>
-
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
-
                                 <Link
                                     href="/profile"
-                                    className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                                    className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                                 >
                                     প্রোফাইল
                                 </Link>
 
                                 <button
                                     type="button"
-                                    className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                                    className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600"
                                 >
                                     সাইন আউট
                                 </button>
-
                             </div>
                         )}
-
                     </div>
                 </div>
             </div>
 
-
-            {/* =========================================
-                CATEGORY NAVIGATION
-            ========================================= */}
+            {/* CATEGORY NAVIGATION */}
             <div className="border-b border-gray-200 bg-white">
-
                 <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
 
                     <nav className="flex items-center justify-between overflow-x-auto scrollbar-hide">
 
                         {categories.map((category) => {
-
                             const isActive =
-                                pathname === `/category/${category.slug}`;
+                                pathname === `/category/${category.slug}` ||
+                                pathname.startsWith(
+                                    `/category/${category.slug}/`
+                                );
 
                             return (
                                 <Link
                                     key={category.slug}
                                     href={`/category/${category.slug}`}
-                                    className={`
-                                        flex shrink-0 items-center justify-center
-                                        gap-2 border-b-2
-                                        px-3 py-3
-                                        text-xs font-medium
-                                        transition-all
-                                        sm:px-5 sm:text-sm
-                                        ${isActive
-                                            ? "rounded-t-lg border-green-600 bg-green-50 text-green-600"
-                                            : "border-transparent text-gray-700 hover:bg-green-50 hover:text-green-600"
-                                        }
-                                    `}
+                                    className={
+                                        isActive
+                                            ? "flex shrink-0 items-center justify-center gap-2 border-b-2 border-green-600 bg-green-50 px-3 py-3 text-xs font-medium text-green-600 transition-all sm:px-5 sm:py-4 sm:text-sm"
+                                            : "flex shrink-0 items-center justify-center gap-2 border-b-2 border-transparent px-3 py-3 text-xs font-medium text-gray-700 transition-all hover:bg-green-50 hover:text-green-600 sm:px-5 sm:py-4 sm:text-sm"
+                                    }
                                 >
-                                    <span className="text-base sm:text-lg">
+                                    <span className="shrink-0 text-base sm:text-lg">
                                         {category.icon}
                                     </span>
 
@@ -201,15 +176,8 @@ export default function Navbar() {
                         })}
 
                     </nav>
-
                 </div>
             </div>
-
-
-            {/* =========================================
-                PRICE TICKER
-            ========================================= */}
-            <PriceTicker />
 
         </header>
     );

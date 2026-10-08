@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+    toBanglaNumber,
+    getProductSlug,
+} from "./priceUtils";
 
 const API_URL =
     "https://api.abcz.workers.dev/api/bazardor/products";
+
 const AllProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,7 +21,9 @@ const AllProducts = () => {
                 const response = await fetch(API_URL);
 
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
+                    throw new Error(
+                        `API Error: ${response.status}`
+                    );
                 }
 
                 const data = await response.json();
@@ -27,7 +35,10 @@ const AllProducts = () => {
                 setProducts(productList);
             } catch (error) {
                 console.error("FETCH ERROR:", error);
-                setError("পণ্যের তথ্য লোড করা যায়নি।");
+
+                setError(
+                    "পণ্যের তথ্য লোড করা যায়নি।"
+                );
             } finally {
                 setLoading(false);
             }
@@ -36,6 +47,7 @@ const AllProducts = () => {
         fetchProducts();
     }, []);
 
+    // Loading
     if (loading) {
         return (
             <section
@@ -43,6 +55,7 @@ const AllProducts = () => {
                 className="bg-[#f3f8f4] px-4 py-10 sm:py-12"
             >
                 <div className="mx-auto max-w-7xl">
+
                     <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
                         সব পণ্য
                     </h2>
@@ -50,11 +63,13 @@ const AllProducts = () => {
                     <p className="mt-1 text-sm text-gray-500">
                         পণ্য লোড হচ্ছে...
                     </p>
+
                 </div>
             </section>
         );
     }
 
+    // Error
     if (error) {
         return (
             <section
@@ -62,9 +77,11 @@ const AllProducts = () => {
                 className="bg-[#f3f8f4] px-4 py-10 sm:py-12"
             >
                 <div className="mx-auto max-w-7xl">
+
                     <div className="rounded-xl bg-red-50 p-5 text-center text-red-600">
                         {error}
                     </div>
+
                 </div>
             </section>
         );
@@ -79,6 +96,7 @@ const AllProducts = () => {
 
                 {/* Header */}
                 <div className="mb-5">
+
                     <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
                         সব পণ্য
                     </h2>
@@ -86,20 +104,27 @@ const AllProducts = () => {
                     <p className="mt-1 text-sm text-gray-500">
                         বাজারের সব পণ্যের আজকের দাম
                     </p>
+
                 </div>
 
                 {/* Product Grid */}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 
                     {products.map((product) => {
-                        const direction = product.change?.dir;
-                        const percentage = product.change?.pct || 0;
+
+                        const direction =
+                            product.change?.dir;
+
+                        const percentage =
+                            product.change?.pct || 0;
 
                         return (
-                            <div
+                            <Link
                                 key={product.id}
-                                className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-4"
+                                href={`/product/${getProductSlug(product)}`}
+                                className="block rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-4"
                             >
+
                                 {/* Product Info */}
                                 <div className="flex items-center gap-3">
 
@@ -112,6 +137,7 @@ const AllProducts = () => {
 
                                     {/* Name */}
                                     <div className="min-w-0 flex-1">
+
                                         <h3 className="truncate text-sm font-semibold text-gray-900">
                                             {product.nameBn}
                                         </h3>
@@ -119,44 +145,66 @@ const AllProducts = () => {
                                         <p className="mt-0.5 text-xs text-gray-400">
                                             প্রতি {product.unit}
                                         </p>
+
                                     </div>
+
                                 </div>
 
                                 {/* Bottom */}
                                 <div className="mt-3 flex items-end justify-between gap-2">
 
                                     <div>
+
                                         <p className="text-xs text-gray-400">
                                             আজকের দাম
                                         </p>
 
                                         <p className="mt-0.5 text-base font-bold text-gray-900">
-                                            ৳{product.today}
+                                            {toBanglaNumber(
+                                                product.today
+                                            )}{" "}
+                                            টাকা
                                         </p>
+
                                     </div>
 
-                                    {/* Change */}
+                                    {/* Up */}
                                     {direction === "up" && (
-                                        <span className="rounded-full bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-500">
-                                            ▲ {percentage}%
-                                        </span>
-                                    )}
-
-                                    {direction === "down" && (
                                         <span className="rounded-full bg-green-50 px-2 py-1 text-[10px] font-semibold text-green-600">
-                                            ▼ {Math.abs(percentage)}%
+                                            ▲{" "}
+                                            {toBanglaNumber(
+                                                percentage
+                                            )}
+                                            %
                                         </span>
                                     )}
 
+                                    {/* Down */}
+                                    {direction === "down" && (
+                                        <span className="rounded-full bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-600">
+                                            ▼{" "}
+                                            {toBanglaNumber(
+                                                Math.abs(
+                                                    percentage
+                                                )
+                                            )}
+                                            %
+                                        </span>
+                                    )}
+
+                                    {/* Flat */}
                                     {direction === "flat" && (
                                         <span className="rounded-full bg-gray-50 px-2 py-1 text-[10px] font-semibold text-gray-400">
-                                            — 0%
+                                            — ০%
                                         </span>
                                     )}
+
                                 </div>
-                            </div>
+
+                            </Link>
                         );
                     })}
+
                 </div>
 
                 {/* Empty */}
@@ -165,6 +213,7 @@ const AllProducts = () => {
                         কোনো পণ্য পাওয়া যায়নি।
                     </div>
                 )}
+
             </div>
         </section>
     );

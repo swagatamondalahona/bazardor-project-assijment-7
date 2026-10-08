@@ -1,7 +1,5 @@
 "use client";
 
-import styles from "./PriceTicker.module.css";
-
 const prices = [
     {
         name: "চাল (মিনিকেট)",
@@ -40,46 +38,38 @@ const prices = [
     },
 ];
 
-function PriceItems() {
-    return (
-        <div className="flex shrink-0 items-center">
-            {prices.map((item, index) => (
-                <div
-                    key={`${item.name}-${index}`}
-                    className="flex shrink-0 items-center gap-2 border-r border-gray-200 px-6 py-3 text-xs sm:px-8 sm:text-sm"
-                >
-                    <span className="text-lg">
-                        {item.icon}
-                    </span>
-
-                    <span className="font-semibold text-gray-800">
-                        {item.name}
-                    </span>
-
-                    <span className="text-gray-600">
-                        {item.price}
-                    </span>
-
-                    {item.direction === "up" ? (
-                        <span className="font-semibold text-green-600">
-                            ▲ {item.change}
-                        </span>
-                    ) : (
-                        <span className="font-semibold text-red-500">
-                            ▼ {item.change}
-                        </span>
-                    )}
-                </div>
-            ))}
-        </div>
-    );
-}
-
 export default function PriceTicker() {
     return (
-        <div className="w-full overflow-hidden border-b border-gray-200 bg-[#f0faf6]">
-            <div className={styles.ticker}>
-                <PriceItems />
+        <div className="price-ticker-wrapper">
+            <div className="price-ticker-track">
+                {prices.map((item, index) => (
+                    <div
+                        key={`${item.name}-${index}`}
+                        className="price-item"
+                    >
+                        <span className="price-icon">
+                            {item.icon}
+                        </span>
+
+                        <span className="price-name">
+                            {item.name}
+                        </span>
+
+                        <span className="price-value">
+                            {item.price}
+                        </span>
+
+                        {item.direction === "up" ? (
+                            <span className="price-up">
+                                ▲ {item.change}
+                            </span>
+                        ) : (
+                            <span className="price-down">
+                                ▼ {item.change}
+                            </span>
+                        )}
+                    </div>
+                ))}
             </div>
         </div>
     );

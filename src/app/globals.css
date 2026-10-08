@@ -24,3 +24,78 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* =========================
+   PRICE TICKER
+========================= */
+
+/* =========================
+   PRICE TICKER
+========================= */
+.price-ticker-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: #f0faf6;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.price-ticker-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.price-ticker-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+}
+
+.price-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 12px 32px;
+  border-right: 1px solid #e5e7eb;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.price-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.price-name {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.price-value {
+  flex-shrink: 0;
+  color: #4b5563;
+}
+
+.price-up {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.price-down {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+@media (max-width: 640px) {
+  .price-item {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  .price-icon {
+    font-size: 18px;
+  }
+}
