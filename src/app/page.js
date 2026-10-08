@@ -1,13 +1,17 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import ProductSection from "./components/ProductSection";
+import PriceRisers from "./components/PriceRisers";
 
 export default function Home() {
   return (
     <main>
       <Navbar />
+
       <Hero />
-      <ProductSection />
+
+      <section className="mx-auto max-w-7xl px-4">
+        <PriceRisers />
+      </section>
     </main>
   );
 }
