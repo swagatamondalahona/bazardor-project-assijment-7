@@ -99,3 +99,11 @@ body {
     font-size: 18px;
   }
 }
+
+.emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji",
+    "Noto Color Emoji", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+}

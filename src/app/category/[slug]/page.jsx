@@ -9,22 +9,22 @@ import { toBanglaNumber } from "../../components/priceUtils";
 const API_BASE = "/api/products";
 
 const categoryInfo = {
-    chal: { name: "চাল", icon: "🍚" },
-    dal: { name: "ডাল", icon: "🌾" },
-    tel: { name: "তেল", icon: "🫙" },
-    sobji: { name: "সবজি", icon: "🥬" },
-    mach: { name: "মাছ", icon: "🐟" },
-    mangsho: { name: "মাংস", icon: "🍗" },
-    dim: { name: "ডিম-দুধ", icon: "🥚" },
-    mosla: { name: "মসলা", icon: "🌶️" },
+    chal: { name: "চাল", icon: "🍚", apiSlug: "chal" },
+    dal: { name: "ডাল", icon: "🫘", apiSlug: "dal" },
+    tel: { name: "তেল", icon: "🫙", apiSlug: "tel" },
+    sobji: { name: "সবজি", icon: "🥬", apiSlug: "sobji" },
+    mach: { name: "মাছ", icon: "🐟", apiSlug: "mach" },
+    mangsho: { name: "মাংস", icon: "🍗", apiSlug: "mangsho" },
+    dim: { name: "ডিম-দুধ", icon: "🥚", apiSlug: "dim-dui" },
+    mosla: { name: "মসলা", icon: "🌶️", apiSlug: "mosla" },
 };
 
 function CategoryContent() {
     const params = useParams();
     const slug = params?.slug;
+    const category = categoryInfo[slug];
 
-    // URL-এর dim-কে API-এর dim-dui-তে রূপান্তর
-    const categorySlug = slug === "dim" ? "dim-dui" : slug;
+    const categorySlug = category?.apiSlug || slug;
 
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -80,20 +80,12 @@ function CategoryContent() {
         };
     }, [categorySlug]);
 
-    // UI-এর ক্যাটাগরি URL slug দিয়েই নির্ধারিত হবে
-    const category = categoryInfo[slug] || {
-        name: "পণ্য",
-        icon: "🛒",
-    };
-
     const sortedProducts = [...products].sort((a, b) => {
-        if (sort === "low") {
-            return Number(a.today) - Number(b.today);
-        }
+        const priceA = Number(a.today) || 0;
+        const priceB = Number(b.today) || 0;
 
-        if (sort === "high") {
-            return Number(b.today) - Number(a.today);
-        }
+        if (sort === "low") return priceA - priceB;
+        if (sort === "high") return priceB - priceA;
 
         return 0;
     });
@@ -121,30 +113,42 @@ function CategoryContent() {
         );
     }
 
-    if (error || !categoryInfo[slug] || products.length === 0) {
+    if (!category) {
         return (
             <main className="flex min-h-[60vh] items-center justify-center bg-gray-50 px-4">
                 <div className="text-center">
-                    <p className="text-5xl">
-                        {error ? "⚠️" : "😕"}
-                    </p>
-
+                    <p className="text-5xl">😕</p>
                     <h1 className="mt-4 text-2xl font-bold text-gray-800">
-                        {error
-                            ? "পণ্য লোড করা যায়নি"
-                            : "এই ক্যাটাগরিতে পণ্য পাওয়া যায়নি"}
+                        ক্যাটাগরি পাওয়া যায়নি
                     </h1>
-
-                    <p className="mt-2 text-gray-500">
-                        অন্য ক্যাটাগরি নির্বাচন করে আবার চেষ্টা করো।
-                    </p>
-
                     <Link
                         href="/"
-                        className="mt-5 inline-block rounded-xl bg-green-600 px-5 py-3 font-semibold text-white transition hover:bg-green-700"
+                        className="mt-5 inline-block rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
                     >
                         ← হোমে ফিরে যাও
                     </Link>
+                </div>
+            </main>
+        );
+    }
+
+    if (error) {
+        return (
+            <main className="flex min-h-[60vh] items-center justify-center bg-gray-50 px-4">
+                <div className="text-center">
+                    <p className="text-5xl">⚠️</p>
+                    <h1 className="mt-4 text-2xl font-bold text-gray-800">
+                        পণ্য লোড করা যায়নি
+                    </h1>
+                    <p className="mt-2 text-gray-500">
+                        ইন্টারনেট বা API ঠিক আছে কি না পরীক্ষা করে আবার চেষ্টা করো।
+                    </p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-5 rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
+                    >
+                        আবার চেষ্টা করো
+                    </button>
                 </div>
             </main>
         );
@@ -162,7 +166,7 @@ function CategoryContent() {
 
                 <section className="mt-5 flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm sm:flex-row sm:items-center">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-50 text-4xl">
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-4xl">
                             {category.icon}
                         </div>
 
@@ -192,78 +196,90 @@ function CategoryContent() {
                     </label>
                 </section>
 
-                <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    {sortedProducts.map((product) => {
-                        const direction = product.change?.dir;
-                        const productSlug = product.slug || product.id;
+                {products.length === 0 ? (
+                    <div className="mt-8 rounded-2xl bg-white px-5 py-12 text-center shadow-sm">
+                        <p className="text-5xl">{category.icon}</p>
+                        <h2 className="mt-4 text-xl font-bold text-gray-800">
+                            এই ক্যাটাগরিতে পণ্য পাওয়া যায়নি
+                        </h2>
+                        <p className="mt-2 text-gray-500">
+                            পরে আবার চেষ্টা করো।
+                        </p>
+                    </div>
+                ) : (
+                    <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        {sortedProducts.map((product, index) => {
+                            const direction = product.change?.dir;
+                            const productSlug = product.slug || product.id;
 
-                        const unitName =
-                            product.unit === "kg"
-                                ? "কেজি"
-                                : ["liter", "litre"].includes(product.unit)
-                                    ? "লিটার"
-                                    : product.unit === "dozen"
-                                        ? "ডজন"
-                                        : product.unit === "piece"
-                                            ? "টি"
-                                            : product.unit || "একক";
+                            const unitName =
+                                product.unit === "kg"
+                                    ? "কেজি"
+                                    : ["liter", "litre"].includes(
+                                        product.unit
+                                    )
+                                        ? "লিটার"
+                                        : product.unit === "dozen"
+                                            ? "ডজন"
+                                            : product.unit === "piece"
+                                                ? "টি"
+                                                : product.unit || "একক";
 
-                        return (
-                            <Link
-                                key={product.id}
-                                href={`/product/${productSlug}`}
-                                className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md"
-                            >
-                                <div className="flex items-start justify-between gap-3">
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-green-50 text-3xl">
-                                        {product.image ||
-                                            product.categoryIcon ||
-                                            category.icon}
-                                    </div>
+                            return (
+                                <Link
+                                    key={product.id || product.slug || index}
+                                    href={`/product/${productSlug}`}
+                                    className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-green-50 text-3xl">
+                                            {category.icon}
+                                        </div>
 
-                                    <span
-                                        className={`rounded-full px-3 py-1 text-xs font-semibold ${direction === "up"
-                                                ? "bg-red-50 text-red-600"
+                                        <span
+                                            className={`rounded-full px-3 py-1 text-xs font-semibold ${direction === "up"
+                                                    ? "bg-red-50 text-red-600"
+                                                    : direction === "down"
+                                                        ? "bg-green-50 text-green-700"
+                                                        : "bg-gray-100 text-gray-500"
+                                                }`}
+                                        >
+                                            {direction === "up"
+                                                ? `▲ ${toBanglaNumber(product.change?.pct)}%`
                                                 : direction === "down"
-                                                    ? "bg-green-50 text-green-700"
-                                                    : "bg-gray-100 text-gray-500"
-                                            }`}
-                                    >
-                                        {direction === "up"
-                                            ? `▲ ${toBanglaNumber(product.change?.pct)}%`
-                                            : direction === "down"
-                                                ? `▼ ${toBanglaNumber(product.change?.pct)}%`
-                                                : "—"}
-                                    </span>
-                                </div>
-
-                                <h2 className="mt-4 text-lg font-bold text-gray-900 group-hover:text-green-700">
-                                    {product.nameBn || product.name}
-                                </h2>
-
-                                <p className="mt-1 text-sm text-gray-500">
-                                    প্রতি {unitName}
-                                </p>
-
-                                <div className="mt-4 flex items-end justify-between gap-3 border-t border-gray-100 pt-4">
-                                    <div>
-                                        <p className="text-xs text-gray-500">
-                                            আজকের দাম
-                                        </p>
-
-                                        <p className="mt-1 text-2xl font-bold text-gray-900">
-                                            {toBanglaNumber(product.today)} টাকা
-                                        </p>
+                                                    ? `▼ ${toBanglaNumber(product.change?.pct)}%`
+                                                    : "—"}
+                                        </span>
                                     </div>
 
-                                    <span className="text-sm font-semibold text-green-700">
-                                        বিস্তারিত →
-                                    </span>
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </div>
+                                    <h2 className="mt-4 text-lg font-bold text-gray-900 group-hover:text-green-700">
+                                        {product.nameBn || product.name || "পণ্যের নাম নেই"}
+                                    </h2>
+
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        প্রতি {unitName}
+                                    </p>
+
+                                    <div className="mt-4 flex items-end justify-between gap-3 border-t border-gray-100 pt-4">
+                                        <div>
+                                            <p className="text-xs text-gray-500">
+                                                আজকের দাম
+                                            </p>
+
+                                            <p className="mt-1 text-2xl font-bold text-gray-900">
+                                                {toBanglaNumber(product.today)} টাকা
+                                            </p>
+                                        </div>
+
+                                        <span className="text-sm font-semibold text-green-700">
+                                            বিস্তারিত →
+                                        </span>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </main>
     );

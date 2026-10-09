@@ -1,7 +1,9 @@
+
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import PriceTicker from "./components/PriceTicker";
 import { Suspense } from "react";
+import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   title: "BazarDor",
@@ -12,6 +14,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="bn">
       <body>
+        <Toaster position="top-right" />
+
         <Suspense fallback={null}>
           <Navbar />
         </Suspense>
@@ -23,3 +27,6 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
+
+
