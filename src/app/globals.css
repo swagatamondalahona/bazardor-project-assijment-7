@@ -12,16 +12,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: #ffffff;
+  color: #171717;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -29,24 +22,24 @@ body {
    PRICE TICKER
 ========================= */
 
-/* =========================
-   PRICE TICKER
-========================= */
 .price-ticker-wrapper {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   background: #f0faf6;
   border-bottom: 1px solid #e5e7eb;
-}
-
-.price-ticker-wrapper::-webkit-scrollbar {
-  display: none;
 }
 
 .price-ticker-track {
   display: flex;
   width: max-content;
+  align-items: center;
+  animation: priceTickerScroll 25s linear infinite;
+  will-change: transform;
+}
+
+.price-ticker-group {
+  display: flex;
+  flex-shrink: 0;
   align-items: center;
 }
 
@@ -64,6 +57,7 @@ body {
 .price-icon {
   flex-shrink: 0;
   font-size: 20px;
+  line-height: 1;
 }
 
 .price-name {
@@ -80,13 +74,23 @@ body {
 .price-up {
   flex-shrink: 0;
   font-weight: 600;
-  color: #16a34a;
+  color: #dc2626;
 }
 
 .price-down {
   flex-shrink: 0;
   font-weight: 600;
-  color: #ef4444;
+  color: #16a34a;
+}
+
+@keyframes priceTickerScroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @media (max-width: 640px) {
@@ -100,10 +104,8 @@ body {
   }
 }
 
-.emoji {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji",
-    "Noto Color Emoji", sans-serif;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
+@media (prefers-reduced-motion: reduce) {
+  .price-ticker-track {
+    animation: none;
+  }
 }

@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { toBanglaNumber } from "../../components/priceUtils";
+import ProductAuthGuard from "../../components/ProductAuthGuard";
 
 const API_URL = "/api/products";
 
@@ -235,8 +236,8 @@ function ProductDetails() {
 
                         <div
                             className={`rounded-2xl border p-6 ${isUp
-                                ? "border-red-100 bg-red-50"
-                                : "border-blue-100 bg-blue-50"
+                                    ? "border-red-100 bg-red-50"
+                                    : "border-blue-100 bg-blue-50"
                                 }`}
                         >
                             <p className="text-sm font-medium text-gray-600">
@@ -247,7 +248,9 @@ function ProductDetails() {
                                     }`}
                             >
                                 {isUp ? "↑" : "↓"}{" "}
-                                {toBanglaNumber(Math.abs(Number(changePercent)))}%
+                                {toBanglaNumber(
+                                    Math.abs(Number(changePercent))
+                                )}%
                             </p>
                             <p className="mt-2 text-sm text-gray-500">
                                 গতকাল: {formatPrice(yesterday)}
@@ -383,8 +386,9 @@ export default function ProductPage() {
                 </div>
             }
         >
-            <ProductDetails />
+            <ProductAuthGuard>
+                <ProductDetails />
+            </ProductAuthGuard>
         </Suspense>
     );
 }
-

@@ -1,10 +1,13 @@
 
 import { NextResponse } from "next/server";
+import { connection } from "next/server";
 
 const API_URL =
     "https://api.api-store.workers.dev/api/bazardor/products";
 
 export async function GET(request) {
+    await connection();
+
     try {
         const { searchParams } = new URL(request.url);
         const category = searchParams.get("category");

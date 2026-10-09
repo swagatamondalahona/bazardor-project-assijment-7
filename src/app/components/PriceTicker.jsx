@@ -1,3 +1,4 @@
+
 "use client";
 
 const prices = [
@@ -40,34 +41,43 @@ const prices = [
 
 export default function PriceTicker() {
     return (
-        <div className="price-ticker-wrapper">
+        <div
+            className="price-ticker-wrapper"
+            aria-label="বাজারদরের আপডেট"
+        >
             <div className="price-ticker-track">
-                {prices.map((item, index) => (
+                {[0, 1].map((group) => (
                     <div
-                        key={`${item.name}-${index}`}
-                        className="price-item"
+                        className="price-ticker-group"
+                        key={group}
+                        aria-hidden={group === 1 ? "true" : undefined}
                     >
-                        <span className="price-icon">
-                            {item.icon}
-                        </span>
+                        {prices.map((item) => (
+                            <div className="price-item" key={item.name}>
+                                <span className="price-icon">
+                                    {item.icon}
+                                </span>
 
-                        <span className="price-name">
-                            {item.name}
-                        </span>
+                                <span className="price-name">
+                                    {item.name}
+                                </span>
 
-                        <span className="price-value">
-                            {item.price}
-                        </span>
+                                <span className="price-value">
+                                    {item.price}
+                                </span>
 
-                        {item.direction === "up" ? (
-                            <span className="price-up">
-                                ▲ {item.change}
-                            </span>
-                        ) : (
-                            <span className="price-down">
-                                ▼ {item.change}
-                            </span>
-                        )}
+                                <span
+                                    className={
+                                        item.direction === "up"
+                                            ? "price-up"
+                                            : "price-down"
+                                    }
+                                >
+                                    {item.direction === "up" ? "▲" : "▼"}{" "}
+                                    {item.change}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 ))}
             </div>

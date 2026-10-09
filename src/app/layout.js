@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import PriceTicker from "./components/PriceTicker";
 import { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
+import Footer from "./components/Footer";
 
 export const metadata = {
   title: "BazarDor",
@@ -23,6 +24,8 @@ export default function RootLayout({ children }) {
         <PriceTicker />
 
         {children}
+        {/* FOOTER */}
+        <Footer />
       </body>
     </html>
   );
