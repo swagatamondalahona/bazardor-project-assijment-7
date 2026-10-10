@@ -1,4 +1,3 @@
-
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
@@ -44,6 +43,10 @@ export const auth = betterAuth({
     database: mongodbAdapter(database, {
         client,
     }),
+
+    // প্রোডাকশন ইউআরএল এবং ট্রাস্টেড অরিজিন যোগ করা হলো
+    baseURL: process.env.BETTER_AUTH_URL || "https://bazardor-project-assijment-7-2rwk.vercel.app",
+    trustedOrigins: ["https://bazardor-project-assijment-7-2rwk.vercel.app"],
 
     emailAndPassword: {
         enabled: true,
