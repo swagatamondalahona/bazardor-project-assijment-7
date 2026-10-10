@@ -13,8 +13,10 @@ if (!uri) {
 
 const client = new MongoClient(uri);
 
-const database = client.db("bazardor");
+// MongoDB database
+export const database = client.db("bazardor");
 
+// Social login providers
 const socialProviders = {};
 
 if (
@@ -37,6 +39,7 @@ if (
     };
 }
 
+// Better Auth configuration
 export const auth = betterAuth({
     database: mongodbAdapter(database, {
         client,
@@ -48,4 +51,3 @@ export const auth = betterAuth({
 
     socialProviders,
 });
-

@@ -3,9 +3,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession, signOut, authClient } from "@/lib/auth-client";
 import Image from "next/image";
-import { LogOut, UserRound, Pencil, X, Save } from "lucide-react";
+import {
+    useSession,
+    signOut,
+    authClient,
+} from "@/lib/auth-client";
+import {
+    LogOut,
+    UserRound,
+    Pencil,
+    X,
+    Save,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function ProfilePage() {
@@ -16,10 +26,67 @@ export default function ProfilePage() {
     const [name, setName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
 
+    // GitHub profile information
+    const [githubImage, setGithubImage] = useState(null);
+    const [githubLogin, setGithubLogin] = useState("");
+
+    const user = session?.user;
+
+    // Load GitHub avatar
+    useEffect(() => {
+        if (!session?.user?.id) {
+            setGithubImage(null);
+            setGithubLogin("");
+            return;
+        }
+
+        let cancelled = false;
+
+        async function loadGitHubProfile() {
+            try {
+                const response = await fetch(
+                    "/api/profile/github-avatar",
+                    { cache: "no-store" }
+                );
+
+                if (!response.ok) {
+                    if (!cancelled) {
+                        setGithubImage(null);
+                        setGithubLogin("");
+                    }
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (!cancelled) {
+                    setGithubImage(data.image || null);
+                    setGithubLogin(data.login || "");
+                }
+            } catch (error) {
+                console.error(
+                    "GitHub profile loading failed:",
+                    error
+                );
+            }
+        }
+
+        loadGitHubProfile();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [session?.user?.id]);
+
+    // Sync name with session
     useEffect(() => {
         setName(session?.user?.name || "");
     }, [session?.user?.name]);
 
+    // Prefer GitHub avatar, otherwise use the saved profile image
+    const profileImage = githubImage || user?.image || null;
+
+    // Sign Out
     const handleSignOut = async () => {
         try {
             await signOut({
@@ -30,10 +97,13 @@ export default function ProfilePage() {
                 },
             });
         } catch {
-            toast.error("সাইন আউট করা যায়নি। আবার চেষ্টা করুন।");
+            toast.error(
+                "সাইন আউট করা যায়নি। আবার চেষ্টা করুন।"
+            );
         }
     };
 
+    // Update name
     const handleUpdateName = async (event) => {
         event.preventDefault();
 
@@ -49,7 +119,7 @@ export default function ProfilePage() {
             return;
         }
 
-        if (updatedName === session?.user?.name) {
+        if (updatedName === user?.name) {
             toast.error("নামে কোনো পরিবর্তন করা হয়নি।");
             return;
         }
@@ -62,11 +132,12 @@ export default function ProfilePage() {
             });
 
             if (error) {
-                toast.error(error.message || "নাম আপডেট করা যায়নি।");
+                toast.error(
+                    error.message || "নাম আপডেট করা যায়নি।"
+                );
                 return;
             }
 
-            setName(updatedName);
             setIsEditing(false);
 
             if (typeof refetch === "function") {
@@ -74,26 +145,32 @@ export default function ProfilePage() {
             }
 
             router.refresh();
-
-            toast.success("আপনার নাম সফলভাবে আপডেট হয়েছে!");
+            toast.success(
+                "আপনার নাম সফলভাবে আপডেট হয়েছে!"
+            );
         } catch (error) {
             toast.error(
-                error?.message || "সমস্যা হয়েছে। আবার চেষ্টা করুন।"
+                error?.message ||
+                "সমস্যা হয়েছে। আবার চেষ্টা করুন।"
             );
         } finally {
             setIsSaving(false);
         }
     };
 
+    // Loading
     if (isPending) {
         return (
             <main className="flex min-h-[60vh] items-center justify-center bg-gray-50">
-                <p className="text-gray-500">লোড হচ্ছে...</p>
+                <p className="text-gray-500">
+                    প্রোফাইল লোড হচ্ছে...
+                </p>
             </main>
         );
     }
 
-    if (!session?.user) {
+    // Not logged in
+    if (!user) {
         return (
             <main className="flex min-h-[60vh] flex-col items-center justify-center bg-gray-50 px-4 text-center">
                 <UserRound className="mb-4 h-12 w-12 text-gray-400" />
@@ -106,12 +183,13 @@ export default function ProfilePage() {
                     প্রোফাইল দেখতে অনুগ্রহ করে লগইন করুন।
                 </p>
 
-                <a
-                    href="/signin"
-                    className="mt-5 rounded-lg bg-emerald-600 px-6 py-2.5 text-white transition hover:bg-emerald-700"
+                <button
+                    type="button"
+                    onClick={() => router.push("/signin")}
+                    className="mt-5 rounded-lg bg-emerald-600 px-6 py-2.5 text-white hover:bg-emerald-700"
                 >
                     লগইন করো
-                </a>
+                </button>
             </main>
         );
     }
@@ -129,27 +207,39 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-6">
-                {/* User Profile Card */}
+                {/* Profile card */}
                 <section className="flex flex-col gap-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
                     <div className="flex min-w-0 items-center gap-4">
                         <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-100 text-xl font-bold text-emerald-700">
-                            {session.user.image ? (
+                            {profileImage ? (
                                 <Image
-                                    src={session.user.image}
-                                    alt={session.user.name || "User Avatar"}
+                                    key={profileImage}
+                                    src={profileImage}
+                                    alt={user.name || "User Avatar"}
                                     fill
                                     sizes="64px"
                                     className="object-cover"
+                                    unoptimized
                                 />
                             ) : (
-                                session.user.name?.charAt(0)?.toUpperCase() || "U"
+                                user.name?.charAt(0)?.toUpperCase() || "U"
                             )}
                         </div>
 
                         <div className="min-w-0">
                             <h2 className="truncate text-lg font-semibold text-gray-900">
-                                {session.user.name || "ব্যবহারকারী"}
+                                {user.name || "ব্যবহারকারী"}
                             </h2>
+
+                            <p className="truncate text-sm text-gray-500">
+                                {user.email}
+                            </p>
+
+                            {githubLogin && (
+                                <p className="mt-1 truncate text-sm text-gray-600">
+                                    GitHub: @{githubLogin}
+                                </p>
+                            )}
 
                             <span className="mt-2 inline-block rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
                                 সক্রিয় অ্যাকাউন্ট
@@ -167,13 +257,16 @@ export default function ProfilePage() {
                     </button>
                 </section>
 
-                {/* Account Information */}
+                {/* Account information */}
                 <section className="space-y-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
                     <h3 className="text-lg font-semibold text-gray-900">
                         অ্যাকাউন্টের তথ্য
                     </h3>
 
-                    <form onSubmit={handleUpdateName} className="space-y-5">
+                    <form
+                        onSubmit={handleUpdateName}
+                        className="space-y-5"
+                    >
                         <div>
                             <label
                                 htmlFor="profile-name"
@@ -200,12 +293,11 @@ export default function ProfilePage() {
                             />
                         </div>
 
-                        {/* Edit Name Button */}
                         {!isEditing && (
                             <button
                                 type="button"
                                 onClick={() => {
-                                    setName(session.user.name || "");
+                                    setName(user.name || "");
                                     setIsEditing(true);
                                 }}
                                 className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700"
@@ -215,7 +307,6 @@ export default function ProfilePage() {
                             </button>
                         )}
 
-                        {/* Save and Cancel Buttons */}
                         {isEditing && (
                             <div className="flex flex-wrap gap-3">
                                 <button
@@ -233,7 +324,7 @@ export default function ProfilePage() {
                                     type="button"
                                     disabled={isSaving}
                                     onClick={() => {
-                                        setName(session.user.name || "");
+                                        setName(user.name || "");
                                         setIsEditing(false);
                                     }}
                                     className="flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"

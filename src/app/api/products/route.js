@@ -1,13 +1,10 @@
 
 import { NextResponse } from "next/server";
-import { connection } from "next/server";
 
 const API_URL =
-    "https://api.api-store.workers.dev/api/bazardor/products";
+    "https://api.abcz.workers.dev/api/bazardor/products";
 
 export async function GET(request) {
-    await connection();
-
     try {
         const { searchParams } = new URL(request.url);
         const category = searchParams.get("category");
@@ -19,7 +16,7 @@ export async function GET(request) {
         }
 
         const response = await fetch(url.toString(), {
-            cache: "no-store",
+            next: { revalidate: 60 },
         });
 
         if (!response.ok) {

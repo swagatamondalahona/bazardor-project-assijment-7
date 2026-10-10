@@ -4,7 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOut, useSession } from "@/lib/auth-client";
 
 const categories = [
@@ -22,7 +22,53 @@ export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const { data: session, isPending } = useSession();
+
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [githubImage, setGithubImage] = useState(null);
+    const [githubLogin, setGithubLogin] = useState("");
+
+    // Load linked GitHub profile
+    useEffect(() => {
+        if (!session?.user?.id) {
+            setGithubImage(null);
+            setGithubLogin("");
+            return;
+        }
+
+        let cancelled = false;
+
+        async function loadGitHubProfile() {
+            try {
+                const response = await fetch(
+                    "/api/profile/github-avatar",
+                    { cache: "no-store" }
+                );
+
+                if (!response.ok) return;
+
+                const data = await response.json();
+
+                if (!cancelled) {
+                    setGithubImage(data.image || null);
+                    setGithubLogin(data.login || "");
+                }
+            } catch (error) {
+                console.error(
+                    "Navbar GitHub avatar error:",
+                    error
+                );
+            }
+        }
+
+        loadGitHubProfile();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [session?.user?.id]);
+
+    // Prefer GitHub avatar
+    const profileImage = githubImage || session?.user?.image || null;
 
     async function handleSignOut() {
         try {
@@ -73,7 +119,6 @@ export default function Navbar() {
                             </div>
                         ) : session?.user ? (
                             <div className="relative shrink-0">
-                                {/* USER BUTTON - NO BORDER */}
                                 <button
                                     type="button"
                                     onClick={() =>
@@ -83,11 +128,11 @@ export default function Navbar() {
                                     aria-label="User menu"
                                     className="flex items-center gap-2 rounded-xl px-2 py-2 transition hover:bg-green-50 sm:gap-3 sm:px-3"
                                 >
-                                    {/* USER IMAGE */}
-                                    {session.user.image ? (
+                                    {profileImage ? (
                                         <img
-                                            src={session.user.image}
+                                            src={profileImage}
                                             alt={session.user.name || "User"}
+                                            referrerPolicy="no-referrer"
                                             className="h-9 w-9 rounded-full object-cover"
                                         />
                                     ) : (
@@ -138,9 +183,16 @@ export default function Navbar() {
                                             <p className="truncate text-sm font-semibold text-gray-800">
                                                 {session.user.name || "User"}
                                             </p>
+
                                             <p className="truncate text-xs text-gray-500">
                                                 {session.user.email}
                                             </p>
+
+                                            {githubLogin && (
+                                                <p className="mt-1 truncate text-xs text-gray-500">
+                                                    GitHub: @{githubLogin}
+                                                </p>
+                                            )}
                                         </div>
 
                                         <Link
