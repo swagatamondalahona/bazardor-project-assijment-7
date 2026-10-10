@@ -1,10 +1,12 @@
 
-import { NextResponse } from "next/server";
+import { NextResponse, connection } from "next/server";
 
 const API_URL =
     "https://api.abcz.workers.dev/api/bazardor/products";
 
 export async function GET(request) {
+    await connection();
+
     try {
         const { searchParams } = new URL(request.url);
         const category = searchParams.get("category");
