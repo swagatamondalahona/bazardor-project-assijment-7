@@ -39,7 +39,13 @@ if (
 const baseURL =
   process.env.BETTER_AUTH_URL ||
   process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
-  "http://localhost:3000";
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : undefined) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
+  (process.env.NODE_ENV === "production"
+    ? "https://bazardor-project-assijment-7-2rwk.vercel.app"
+    : "http://localhost:3000");
 
 export const auth = betterAuth({
   database: mongodbAdapter(database, {
@@ -52,6 +58,7 @@ export const auth = betterAuth({
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://bazardor-project-assijment-7-2rwk.vercel.app",
+    "https://*.vercel.app",
   ],
 
   emailAndPassword: {
