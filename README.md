@@ -1,12 +1,16 @@
+
 # 🛒 BazarDor — বাজার দর
 
 BazarDor is a responsive web application that helps users check the daily prices of essential market products in Bangladesh. Users can explore product categories, compare price changes, view product details, and access their profile through secure authentication.
+
 ## 📸 Project Screenshot
 
 ![BazarDor Homepage](public/bazardor-homepage.png)
+
 ## 🌐 Live Demo
 
 [Visit BazarDor Website](https://bazar-dor-eight.vercel.app/)
+
 ## ✨ Features
 
 - View daily prices of essential market products.
@@ -38,11 +42,9 @@ BazarDor is a responsive web application that helps users check the daily prices
 ### 1. Clone the Repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/swagatamondalahona/bazardor-project-assijment-7.git
 cd bazardor-project-assijment-7
 ```
-
-Replace `YOUR_GITHUB_REPOSITORY_URL` with your actual GitHub repository URL.
 
 ### 2. Install Dependencies
 
