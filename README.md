@@ -37,6 +37,26 @@ BazarDor is a responsive web application that helps users check the daily prices
 - REST API
 - Vercel
 
+## 📦 Dependencies
+
+### Main Dependencies
+
+- better-auth (^1.7.7)
+- lucide-react (^1.52.0)
+- mongodb (^7.7.0)
+- next (16.4.0)
+- react (19.3.0)
+- react-dom (19.3.0)
+- react-hot-toast (^2.6.1)
+
+### Development Dependencies
+
+- @tailwindcss/turbopack (^4)
+- babel-plugin-react-compiler (1.0.0)
+- eslint (^9)
+- eslint-config-next (16.4.0)
+- tailwindcss (^4)
+
 ## 🚀 Getting Started
 
 ### 1. Clone the Repository
