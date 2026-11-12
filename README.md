@@ -1,7 +1,9 @@
 # 🛒 BazarDor — বাজার দর
 
 BazarDor is a responsive web application that helps users check the daily prices of essential market products in Bangladesh. Users can explore product categories, compare price changes, view product details, and access their profile through secure authentication.
+## 📸 Project Screenshot
 
+![BazarDor Homepage](public/bazardor-homepage.png)
 ## ✨ Features
 
 - View daily prices of essential market products.
